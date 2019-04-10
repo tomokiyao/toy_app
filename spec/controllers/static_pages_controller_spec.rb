@@ -15,4 +15,9 @@ RSpec.describe StaticPagesController, type: :controller do
       get :about
       expect(response.status).to eq 200
     end
+
+    it 'should get contact' do
+      get :contact
+      expect(response.status).to eq 200
+    end
 end
