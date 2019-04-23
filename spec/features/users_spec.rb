@@ -36,4 +36,39 @@ RSpec.feature 'Users', type: :feature do
 
     expect(page).to have_content("can't be blank")
   end
+
+  scenario 'after login change header' do
+    user.save
+
+    visit login_path
+
+    fill_in 'Email', with: user.email
+    fill_in 'Password', with: user.password
+    click_button 'Log in'
+
+    expect(page).to_not have_css("a", text: "Log in")
+    expect(page).to have_css("a", text: "Log out")
+    expect(page).to have_css("a", text: "Profile")
+  end
+
+  describe 'session#destroy' do
+    before do
+      user.save
+      visit login_path
+
+      fill_in 'Email', with: user.email
+      fill_in 'Password', with: user.password
+      click_button 'Log in'
+    end
+
+    scenario 'after logout change header' do
+      visit root_path
+      click_link 'Log out'
+      expect(page).to have_current_path(root_path)
+
+      expect(page).to have_css("a", text: "Log in")
+      expect(page).to_not have_css("a", text: "Log out")
+      expect(page).to_not have_css("a", text: "Profile")
+    end
+  end
 end
