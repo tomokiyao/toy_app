@@ -44,4 +44,49 @@ RSpec.describe 'Users', type: :request do
       end
     end
 
+    describe 'session#destroy' do
+      context '' do
+        before do
+          @user = User.create(params)
+        end
+        it '' do
+          get login_path
+          post login_path, params: {session: {email: @user.email, password: 'password'}}
+
+          expect(response).to have_http_status(302)
+          redirect_to(@user)
+
+          expect(response).to have_http_status(302)
+
+          delete logout_path
+          expect(response).to redirect_to(root_path)
+
+          delete logout_path
+        end
+      end
+    end
+
+    describe 'Remember me' do
+      context 'login with remembering' do
+        before do
+          @user = User.create(params)
+        end
+        it 'remembers cookies' do
+          post login_path, params:{session: { email: @user.email, password: 'password', remember_me: '1' }}
+
+          expect(response.cookies['remember_token']).to_not eq nil
+        end
+
+        it 'not remember cookies' do
+          post login_path, params:{session: { email: @user.email, password: 'password', remember_me: '1' }}
+
+          delete logout_path
+
+          post login_path, params:{session: { email: @user.email, password: 'password', remember_me: '0' }}
+
+          expect(response.cookies['remember_token']).to eq nil
+        end
+      end
+    end
+
 end
